@@ -38,21 +38,27 @@ async function capNhatDanhSachNganhTheoToHop(maToHop) {
 }
 
 // --- Sự kiện tự động thay đổi tên môn học khi chọn tổ hợp ---
+// --- Sự kiện tự động thay đổi tên môn học khi chọn tổ hợp ---
 function xuLyKhiDoiToHop() {
     const selectToHop = document.getElementById('danhMucToHop');
     if (!selectToHop) return;
 
     const maToHopDuocChon = selectToHop.value;
+    const selectedOptionText = selectToHop.options[selectToHop.selectedIndex].text; 
+    // Lấy chuỗi hiển thị, ví dụ: "A00: Toán, Vật lý, Hóa học"
 
     // 1. Cập nhật tên môn học hiển thị trong bảng
-    if (typeof danhMucToHop !== 'undefined' && danhMucToHop[maToHopDuocChon]) {
-        const cacMon = danhMucToHop[maToHopDuocChon];
-        document.getElementById('lblMon1').innerText = cacMon[0];
-        document.getElementById('lblMon2').innerText = cacMon[1];
-        document.getElementById('lblMon3').innerText = cacMon[2];
+    if (selectedOptionText && selectedOptionText.includes(':')) {
+        // Tách lấy phần tên các môn sau dấu ":"
+        const chuoiCacMon = selectedOptionText.split(':')[1].trim(); // "Toán, Vật lý, Hóa học"
+        const cacMon = chuoiCacMon.split(',').map(m => m.trim());    // ["Toán", "Vật lý", "Hóa học"]
+
+        document.getElementById('lblMon1').innerText = cacMon[0] || "Môn 1";
+        document.getElementById('lblMon2').innerText = cacMon[1] || "Môn 2";
+        document.getElementById('lblMon3').innerText = cacMon[2] || "Môn 3";
     } else {
         document.getElementById('lblMon1').innerText = "Môn 1";
-        document.getElementById('lblMon2').innerText = "Môn 2";
+        document.getElementById('lblMon2').innerText = "Môn 3";
         document.getElementById('lblMon3').innerText = "Môn 3";
     }
 
