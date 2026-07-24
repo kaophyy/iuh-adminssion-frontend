@@ -44,7 +44,7 @@ function xuLyKhiDoiToHop() {
     if (!selectToHop) return;
 
     const maToHopDuocChon = selectToHop.value;
-    const selectedOptionText = selectToHop.options[selectToHop.selectedIndex].text; 
+    const selectedOptionText = selectToHop.options[selectToHop.selectedIndex].text;
     // Lấy chuỗi hiển thị, ví dụ: "A00: Toán, Vật lý, Hóa học"
 
     // 1. Cập nhật tên môn học hiển thị trong bảng
@@ -132,8 +132,14 @@ async function xuLyTinhDiem() {
     let diemHocBa = Math.min(hb1, 10) + Math.min(hb2, 10) + Math.min(hb3, 10);
 
     // 2. Đọc điểm ĐGNL, Ưu tiên & Thành tích
-    let diemDgnlGoc = parseInt(document.getElementById('diemDgnlGoc').value) || 0;
-    if (diemDgnlGoc > diemThuKhoaDgnl) diemDgnlGoc = diemThuKhoaDgnl;
+    let diemDgnlGoc = parseFloat(document.getElementById('diemDgnlGoc').value) || 0;
+
+    // KIỂM TRA: Nếu nhập quá 1139 hoặc âm điểm thì báo lỗi bắt nhập lại
+    if (diemDgnlGoc < 0 || diemDgnlGoc > 1139) {
+        alert("Điểm Đánh giá năng lực không hợp lệ! Vui lòng nhập trong khoảng từ 0 đến 1139.");
+        document.getElementById('diemDgnlGoc').focus(); // Đưa con trỏ chuột về ô ĐGNL
+        return; // Dừng không cho tính điểm
+    }
 
     let khuVuc = document.getElementById('khuVuc').value;
     let doiTuong = parseInt(document.getElementById('doiTuong').value);
