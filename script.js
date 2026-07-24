@@ -316,3 +316,27 @@ async function xuLyTinhDiem() {
 
     document.getElementById('ketQuaBox').style.display = "block";
 }
+
+// --- HÀM MỚI THÊM: Xóa toàn bộ lịch sử tính điểm ---
+async function xoaLichSuTinhDiem() {
+    if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử tính điểm không?")) {
+        return; // Người dùng bấm Hủy
+    }
+
+    try {
+        const res = await fetch('https://iuh-admission-api.onrender.com/api/history', {
+            method: 'DELETE'
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Đã xóa sạch lịch sử!");
+            taiLichSuTinhDiem(); // Tải lại giao diện lịch sử trống
+        } else {
+            alert("Lỗi: " + (data.error || "Không thể xóa!"));
+        }
+    } catch (err) {
+        console.error("Lỗi khi xóa lịch sử:", err);
+        alert("Lỗi kết nối Server!");
+    }
+}
