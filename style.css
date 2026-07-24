@@ -339,3 +339,25 @@ input[type="number"]:invalid {
         padding: 0 5px;
     }
 }
+
+/* --- PHẦN LỊCH SỬ TÍNH ĐIỂM --- */
+.history-container {
+    margin-top: 20px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.badge-safe { color: #2e7d32; font-weight: bold; }
+.badge-consider { color: #f57f17; font-weight: bold; }
+.badge-risk { color: #c62828; font-weight: bold; }

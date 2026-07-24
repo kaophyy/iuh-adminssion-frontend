@@ -13,7 +13,6 @@ async function capNhatDanhSachNganhTheoToHop(maToHop) {
     selectNganh.innerHTML = '<option value="" disabled selected>-- Đang tải danh sách ngành... --</option>';
 
     try {
-        // ĐÃ SỬA: Sửa lại đúng URL query parameter (?combination=)
         const response = await fetch(`https://iuh-admission-api.onrender.com/api/majors?combination=${maToHop}`);
         const danhSachNganhHopLe = await response.json();
 
@@ -38,27 +37,24 @@ async function capNhatDanhSachNganhTheoToHop(maToHop) {
 }
 
 // --- Sự kiện tự động thay đổi tên môn học khi chọn tổ hợp ---
-// --- Sự kiện tự động thay đổi tên môn học khi chọn tổ hợp ---
 function xuLyKhiDoiToHop() {
     const selectToHop = document.getElementById('danhMucToHop');
     if (!selectToHop) return;
 
     const maToHopDuocChon = selectToHop.value;
     const selectedOptionText = selectToHop.options[selectToHop.selectedIndex].text;
-    // Lấy chuỗi hiển thị, ví dụ: "A00: Toán, Vật lý, Hóa học"
 
     // 1. Cập nhật tên môn học hiển thị trong bảng
     if (selectedOptionText && selectedOptionText.includes(':')) {
-        // Tách lấy phần tên các môn sau dấu ":"
-        const chuoiCacMon = selectedOptionText.split(':')[1].trim(); // "Toán, Vật lý, Hóa học"
-        const cacMon = chuoiCacMon.split(',').map(m => m.trim());    // ["Toán", "Vật lý", "Hóa học"]
+        const chuoiCacMon = selectedOptionText.split(':')[1].trim(); 
+        const cacMon = chuoiCacMon.split(',').map(m => m.trim());    
 
         document.getElementById('lblMon1').innerText = cacMon[0] || "Môn 1";
         document.getElementById('lblMon2').innerText = cacMon[1] || "Môn 2";
         document.getElementById('lblMon3').innerText = cacMon[2] || "Môn 3";
     } else {
         document.getElementById('lblMon1').innerText = "Môn 1";
-        document.getElementById('lblMon2').innerText = "Môn 3";
+        document.getElementById('lblMon2').innerText = "Môn 2";
         document.getElementById('lblMon3').innerText = "Môn 3";
     }
 
@@ -66,11 +62,73 @@ function xuLyKhiDoiToHop() {
     capNhatDanhSachNganhTheoToHop(maToHopDuocChon);
 }
 
+// --- 🚀 HÀM MỚI THÊM: Tải và hiển thị danh sách Lịch sử tính điểm ---
+async function taiLichSuTinhDiem() {
+    const historyList = document.getElementById('historyList');
+    if (!historyList) return;
+
+    try {
+        const res = await fetch('https://iuh-admission-api.onrender.com/api/history');
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            historyList.innerHTML = '<p class="text-muted" style="text-align: center; color: #888;">Chưa có lịch sử tính điểm nào.</p>';
+            return;
+        }
+
+        let html = '';
+        data.forEach(item => {
+            let statusText = '';
+            let badgeClass = '';
+
+            if (item.status === 'SAFE') {
+                statusText = '🟢 An toàn';
+                badgeClass = 'badge-safe';
+            } else if (item.status === 'CONSIDER') {
+                statusText = '🟡 Cân nhắc';
+                badgeClass = 'badge-consider';
+            } else {
+                statusText = '🔴 Rủi ro';
+                badgeClass = 'badge-risk';
+            }
+
+            // Định dạng thời gian (Giờ:Phút Ngày/Tháng)
+            let thoiGianStr = '';
+            if (item.created_at) {
+                const dateObj = new Date(item.created_at);
+                thoiGianStr = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + dateObj.toLocaleDateString('vi-VN');
+            }
+
+            html += `
+                <div class="history-item">
+                    <div>
+                        <b>${item.major_name}</b> <br>
+                        <small style="color: #888;">${thoiGianStr}</small>
+                    </div>
+                    <div>
+                        <span>Điểm: <b>${parseFloat(item.final_score).toFixed(2)}</b></span>
+                        <span class="${badgeClass}" style="margin-left: 10px;">${statusText}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        historyList.innerHTML = html;
+    } catch (err) {
+        console.error("Lỗi lấy lịch sử:", err);
+        historyList.innerHTML = '<p class="text-muted" style="text-align: center; color: #888;">Không thể kết nối lịch sử tính điểm.</p>';
+    }
+}
+
 // Lắng nghe sự kiện đổi tổ hợp và khởi chạy khi trang tải xong
-document.getElementById('danhMucToHop').addEventListener('change', xuLyKhiDoiToHop);
+const selectToHopElem = document.getElementById('danhMucToHop');
+if (selectToHopElem) {
+    selectToHopElem.addEventListener('change', xuLyKhiDoiToHop);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    xuLyKhiDoiToHop(); // Chạy ngay khi tải trang để đồng bộ (đề phòng F5)
+    xuLyKhiDoiToHop(); // Chạy đồng bộ khi load trang
+    taiLichSuTinhDiem(); // Tải lịch sử ngay khi tải xong trang web
 });
 
 
@@ -137,8 +195,8 @@ async function xuLyTinhDiem() {
     // KIỂM TRA: Nếu nhập quá 1139 hoặc âm điểm thì báo lỗi bắt nhập lại
     if (diemDgnlGoc < 0 || diemDgnlGoc > 1139) {
         alert("Điểm Đánh giá năng lực không hợp lệ! Vui lòng nhập trong khoảng từ 0 đến 1139.");
-        document.getElementById('diemDgnlGoc').focus(); // Đưa con trỏ chuột về ô ĐGNL
-        return; // Dừng không cho tính điểm
+        document.getElementById('diemDgnlGoc').focus();
+        return;
     }
 
     let khuVuc = document.getElementById('khuVuc').value;
@@ -199,7 +257,6 @@ async function xuLyTinhDiem() {
     let htmlSoSanh = "";
 
     try {
-        // ĐÃ SỬA: Thay localhost thành Render URL
         const res = await fetch(`https://iuh-admission-api.onrender.com/api/benchmark?major_id=${maNganhDuocChon}&year=2025`);
         const thongTinNganh = await res.json();
 
@@ -231,7 +288,7 @@ async function xuLyTinhDiem() {
                 </div>
             `;
 
-            // ĐÃ SỬA: Thay localhost thành Render URL
+            // Lưu lịch sử tính điểm vào Backend CSDL
             await fetch('https://iuh-admission-api.onrender.com/api/save-history', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -241,6 +298,9 @@ async function xuLyTinhDiem() {
                     status: chenhLech >= 0.75 ? 'SAFE' : (chenhLech >= -0.5 ? 'CONSIDER' : 'RISK')
                 })
             });
+
+            // Tự động tải lại bảng Lịch sử tính điểm mới nhất trên giao diện
+            taiLichSuTinhDiem();
         }
     } catch (err) {
         console.error("Lỗi lấy điểm chuẩn từ Server:", err);
