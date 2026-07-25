@@ -5,13 +5,13 @@
 ![Backend](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-green)
 ![Database](https://img.shields.io/badge/Database-MySQL%20(Aiven%20Cloud)-orange)
 
-> **Website hỗ trợ thí sinh tra cứu và tính điểm xét tuyển Trường Đại học Công nghiệp TP.HCM (IUH) nhanh chóng, chính xác.**
+> **Website hỗ trợ thí sinh tra cứu và tính điểm xét tuyển vào Trường Đại học Công nghiệp TP.HCM (IUH) nhanh chóng, chính xác.**
 
 ---
 
 ## 🔗 Live Demo
 
-- 🌐 **Website App (Frontend):** [https://iuh-calculation-website.vercel.app](https://iuh-calculation-website.vercel.app) *(Điền link Vercel của bạn vào đây)*
+- 🌐 **Website App (Frontend):** [https://iuh-calculation-website.vercel.app](https://iuh-calculation-website.vercel.app)
 - ⚙️ **API Service (Backend):** [https://iuh-admission-api.onrender.com](https://iuh-admission-api.onrender.com)
 
 ---
